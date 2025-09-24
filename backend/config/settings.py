@@ -54,6 +54,8 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS').split(',')]
 
+AUTH_USER_MODEL = 'core.User'
+
 # Apps
 INSTALLED_APPS = [
     'django.contrib.admin',

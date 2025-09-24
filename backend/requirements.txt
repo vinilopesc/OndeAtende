@@ -5,3 +5,4 @@ django-filter==24.3
 psycopg2-binary==2.9.10
 python-decouple==3.8
 gunicorn==23.0.0
+cryptography==41.0.7

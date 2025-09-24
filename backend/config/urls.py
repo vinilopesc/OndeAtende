@@ -1,58 +1,45 @@
-# config/urls.py
 """
-URLs principais do OndeAtende
-Organiza rotas por domínio com versionamento de API
+URLs principais do OndeAtende - MVP simplificado
 """
-
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularSwaggerView,
-    SpectacularRedocView
-)
-from apps.core.views import healthz
+from django.http import JsonResponse
+from django.shortcuts import redirect
 
-# API v1 patterns
-api_v1_patterns = [
-    path('facilities/', include('apps.facilities.urls')),
-    path('triage/', include('apps.triage.urls')),
-    path('analytics/', include('apps.analytics.urls')),
-    path('auth/', include('apps.core.urls')),
-]
+
+def index_view(request):
+    """
+    View da página inicial - redireciona para admin
+    Em produção, isso seria a landing page ou redirecionaria para o frontend
+    """
+    return redirect('/admin/')
+
+
+def healthcheck(request):
+    """Health check endpoint para monitoramento"""
+    return JsonResponse({
+        "status": "healthy",
+        "service": "OndeAtende Backend",
+        "version": "1.0.0-mvp"
+    })
+
 
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
-    
+
+    # Página inicial
+    path('', index_view, name='index'),
+
     # Health check
-    path('healthz/', healthz, name='healthz'),
-    
-    # API v1
-    path('api/v1/', include(api_v1_patterns)),
-    
-    # OpenAPI/Swagger
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    
-    # Prometheus metrics
-    path('metrics/', include('django_prometheus.urls')),
+    path('health/', healthcheck, name='healthcheck'),
+    path('healthz/', healthcheck),  # Alias para k8s
+
+    # API base (adicionar depois)
+    # path('api/v1/', include('apps.core.urls')),
 ]
 
-# WebSocket routing
-websocket_urlpatterns = [
-    path('ws/triage/<str:facility_id>/', include('apps.triage.routing.websocket_urlpatterns')),
-]
-
-# Static files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# Configure admin site
+# Customização do admin
 admin.site.site_header = "OndeAtende Admin"
 admin.site.site_title = "OndeAtende"
-admin.site.index_title = "Sistema de Triagem Manchester"
+admin.site.index_title = "Painel de Controle"
