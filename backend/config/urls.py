@@ -30,8 +30,8 @@ urlpatterns = [
 
     # Página inicial
     path('', index_view, name='index'),
-
     path('api/prefecture/', include('apps.prefecture.urls')),
+    path('api/core/', include('apps.core.urls')),
 
     # Health check
     path('health/', healthcheck, name='healthcheck'),

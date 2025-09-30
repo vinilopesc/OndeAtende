@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .models import Prefecture, PrefectureUser, HealthUnit, Doctor
+from .models import Prefecture, PrefectureStaff, HealthUnit, Doctor
 
 
 class LoginSerializer(serializers.Serializer):
@@ -39,7 +39,7 @@ class PrefectureUserSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source='get_full_name', read_only=True)
 
     class Meta:
-        model = PrefectureUser
+        model = PrefectureStaff
         fields = ['id', 'username', 'email', 'first_name', 'last_name',
                   'full_name', 'role', 'department', 'phone',
                   'prefecture', 'prefecture_name', 'is_active']

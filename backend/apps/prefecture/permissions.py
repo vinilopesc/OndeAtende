@@ -3,7 +3,7 @@
 from rest_framework import permissions
 
 
-class IsPrefectureUser(permissions.BasePermission):
+class IsPrefectureStaff(permissions.BasePermission):
     """
     Permissão customizada para verificar se o usuário é funcionário da prefeitura.
     """

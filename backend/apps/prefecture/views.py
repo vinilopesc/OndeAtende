@@ -3,6 +3,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import render
 from rest_framework.permissions import AllowAny
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -12,7 +13,7 @@ from .serializers import (
     LoginSerializer, PrefectureStaffSerializer,
     HealthUnitSerializer, DoctorSerializer
 )
-from .permissions import IsPrefectureUser, IsAdminOrReadOnly
+from .permissions import IsPrefectureStaff, IsAdminOrReadOnly
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -55,7 +56,7 @@ class HealthUnitViewSet(viewsets.ModelViewSet):
     Apenas usuários autenticados da prefeitura podem acessar.
     """
     serializer_class = HealthUnitSerializer
-    permission_classes = [IsPrefectureUser, IsAdminOrReadOnly]
+    permission_classes = [IsPrefectureStaff, IsAdminOrReadOnly]
 
     def get_queryset(self):
         """Retorna apenas unidades da prefeitura do usuário atual"""
@@ -91,7 +92,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     ViewSet para gerenciar médicos cadastrados pela prefeitura.
     """
     serializer_class = DoctorSerializer
-    permission_classes = [IsPrefectureUser, IsAdminOrReadOnly]
+    permission_classes = [IsPrefectureStaff, IsAdminOrReadOnly]
 
     def get_queryset(self):
         """Retorna apenas médicos da prefeitura do usuário atual"""
@@ -123,7 +124,7 @@ class MetricsViewSet(viewsets.GenericViewSet):
     """
     ViewSet para métricas e dashboard da prefeitura.
     """
-    permission_classes = [IsPrefectureUser]
+    permission_classes = [IsPrefectureStaff]
 
     @action(detail=False, methods=['get'])
     def dashboard(self, request):
@@ -164,3 +165,12 @@ class MetricsViewSet(viewsets.GenericViewSet):
         }
 
         return Response(metrics)
+
+
+def test_login_page(request):
+    """
+    Página de teste para verificar o funcionamento do login.
+    Apenas para desenvolvimento.
+    """
+    return render(request, 'test_login.html')
+
