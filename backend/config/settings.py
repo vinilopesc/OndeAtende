@@ -67,6 +67,7 @@ INSTALLED_APPS = [
 
     # Third party
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
     'drf_spectacular',
@@ -75,7 +76,8 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.facilities',
     'apps.triage',
-    'apps.analytics'
+    'apps.analytics',
+    'apps.prefecture',
 ]
 
 MIDDLEWARE = [

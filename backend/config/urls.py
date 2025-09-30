@@ -31,6 +31,8 @@ urlpatterns = [
     # Página inicial
     path('', index_view, name='index'),
 
+    path('api/prefecture/', include('apps.prefecture.urls')),
+
     # Health check
     path('health/', healthcheck, name='healthcheck'),
     path('healthz/', healthcheck)
