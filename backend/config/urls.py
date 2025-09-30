@@ -33,9 +33,8 @@ urlpatterns = [
 
     # Health check
     path('health/', healthcheck, name='healthcheck'),
-    path('healthz/', healthcheck),  # Alias para k8s
+    path('healthz/', healthcheck)
 
-    path('api/', include('apps.health.urls')),
 ]
 
 # Customização do admin

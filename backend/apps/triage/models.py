@@ -5,10 +5,10 @@ Gerencia todo o fluxo desde chegada até atendimento
 """
 
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from apps.core.models import TrackedModel, EncryptedField
 from apps.facilities.models import Facility
 from apps.triage.manchester import TriagePriority
+from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 
 
@@ -44,9 +44,9 @@ class Patient(TrackedModel):
         ('AB+', 'AB+'), ('AB-', 'AB-'),
         ('O+', 'O+'), ('O-', 'O-'),
     ])
-    allergies = JSONField(default=list)
-    chronic_conditions = JSONField(default=list)
-    current_medications = JSONField(default=list)
+    allergies = models.JSONField(default=list)
+    chronic_conditions = models.JSONField(default=dict)
+    current_medications = models.JSONField(default=list)
 
     # Contato de emergência
     emergency_contact_name = models.CharField(max_length=100)
@@ -127,13 +127,13 @@ class TriageSession(TrackedModel):
     complaint_description = models.TextField()
     symptom_duration_hours = models.IntegerField(null=True, blank=True)
     pain_scale = models.IntegerField(null=True, blank=True, validators=[
-        models.MinValueValidator(0),
-        models.MaxValueValidator(10)
+        MinValueValidator(0),
+        MaxValueValidator(10)
     ])
 
     # Manchester Triage
     manchester_flowchart = models.CharField(max_length=50)
-    discriminators_answered = JSONField(default=dict)
+    discriminators_answered = models.JSONField(default=dict)
     priority_color = models.CharField(max_length=10, choices=[
         ('RED', 'Vermelho'),
         ('ORANGE', 'Laranja'),
@@ -145,7 +145,7 @@ class TriageSession(TrackedModel):
     priority_reason = models.TextField()
 
     # Sinais vitais na triagem
-    vital_signs = JSONField(default=dict)
+    vital_signs = models.JSONField(default=dict)
     # Estrutura: {
     #     'blood_pressure_systolic': 120,
     #     'blood_pressure_diastolic': 80,
@@ -195,13 +195,17 @@ class TriageSession(TrackedModel):
         Calcula posição na fila baseado em Manchester
         Pacientes com mesma prioridade são ordenados por chegada
         """
+        from django.db.models import Q
+
         return TriageSession.objects.filter(
-            facility=self.facility,
-            status='WAITING',
-            models.Q(priority_level__lt=self.priority_level) |
-            models.Q(
-                priority_level=self.priority_level,
-                arrival_time__lt=self.arrival_time
+            Q(facility=self.facility) &
+            Q(status='WAITING') &
+            (
+                    Q(priority_level__lt=self.priority_level) |
+                    Q(
+                        priority_level=self.priority_level,
+                        arrival_time__lt=self.arrival_time
+                    )
             )
         ).count() + 1
 
@@ -259,7 +263,7 @@ class TriageAuditLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=50)
     performed_by = models.ForeignKey('core.User', on_delete=models.PROTECT)
-    details = JSONField()
+    details = models.JSONField()
 
     class Meta:
         db_table = 'triage_audit_log'

@@ -56,7 +56,6 @@ ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS').split(',')]
 
 AUTH_USER_MODEL = 'core.User'
 
-# Apps
 INSTALLED_APPS = [
     # Django apps
     'django.contrib.admin',
@@ -65,11 +64,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party
     'rest_framework',
     'corsheaders',
     'django_filters',
     'drf_spectacular',
-    'apps.health',
+
+    # Apps do projeto
+    'apps.core',
+    'apps.facilities',
+    'apps.triage',
+    'apps.analytics'
 ]
 
 MIDDLEWARE = [
